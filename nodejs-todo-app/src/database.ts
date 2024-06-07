@@ -10,7 +10,8 @@ db.run(`
   CREATE TABLE IF NOT EXISTS todos (
     id INTEGER PRIMARY KEY,
     task TEXT NOT NULL,
-    status BOOLEAN NOT NULL DEFAULT 0
+    status TEXT NOT NULL DEFAULT 'active',
+    date TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   )
 `);
 

@@ -6,7 +6,8 @@ import db from "../database";
 interface Todo {
   id: number;
   task: string;
-  status: boolean;
+  status: string;
+  date: string;
 }
 
 /**
@@ -14,8 +15,15 @@ interface Todo {
  */
 export const getTodos: RequestHandler = async (req, res, next) => {
   try {
-    const todos = await getTodosInfo();
-    res.status(200).json(todos);
+    const todos = await getTodosInfo(req.query);
+    const todosCount = await getTodosInfoCount(req.query);
+
+    res.status(200).json({
+      todos,
+      page: req.query.page,
+      perPage: req.query.itemsPerPage,
+      total: todosCount.length,
+    });
   } catch (error) {
     next(error);
   }
@@ -67,32 +75,7 @@ export const updateTodo: RequestHandler = async (req, res, next) => {
 
     const todo = await updateTodoInfo(
       parseInt(req.params.id, 10),
-      req.body.task
-    );
-
-    if (!todo) return res.status(404).json({ message: "TODO NOT FOUND!" });
-
-    const todoInfo = await getTodoInfo(parseInt(req.params.id, 10));
-
-    res.status(200).json(todoInfo);
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * Update todo status
- */
-export const updateTodoStatus: RequestHandler = async (req, res, next) => {
-  try {
-    if (!req.body.status && typeof req.body.status !== "number")
-      return res.status(400).json({ error: "Status is require!" });
-
-    if (typeof req.body.status !== "number")
-      return res.status(400).json({ error: "Status must be a number!" });
-
-    const todo = await updateTodoStatusInfo(
-      parseInt(req.params.id, 10),
+      req.body.task,
       req.body.status
     );
 
@@ -148,15 +131,47 @@ function createTodoInfo(task: string): Promise<number> {
   });
 }
 
-function getTodosInfo(): Promise<Todo[]> {
+function getTodosInfo(query: any): Promise<Todo[]> {
   return new Promise<Todo[]>((resolve, reject) => {
-    db.all("SELECT * FROM todos", (err, rows: Todo[]) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(rows);
+    const filter = (query.filter && `%${query.filter}%`) || `%%`;
+    const status = (query.status && `${query.status}`) || `%%`;
+    const offset = (query.page - 1) * query.itemsPerPage;
+
+    db.all(
+      `SELECT * FROM todos WHERE task LIKE '${filter}' 
+        AND  status LIKE '${status}'
+        ORDER BY id ASC
+        LIMIT ${query.itemsPerPage}
+        OFFSET ${offset}
+        `,
+      (err, rows: Todo[]) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
       }
-    });
+    );
+  });
+}
+
+function getTodosInfoCount(query: any): Promise<Todo[]> {
+  return new Promise<Todo[]>((resolve, reject) => {
+    const filter = (query.filter && `%${query.filter}%`) || `%%`;
+    const status = (query.status && `${query.status}`) || `%%`;
+
+    db.all(
+      `SELECT * FROM todos WHERE task LIKE '${filter}' 
+        AND  status LIKE '${status}'
+        `,
+      (err, rows: Todo[]) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      }
+    );
   });
 }
 
@@ -196,27 +211,15 @@ function deleteTodosInfo(): Promise<number> {
   });
 }
 
-function updateTodoInfo(id: number, task: string): Promise<number> {
+function updateTodoInfo(
+  id: number,
+  task: string,
+  status: string
+): Promise<number> {
   return new Promise((resolve, reject) => {
     db.run(
-      `UPDATE todos SET task = ? WHERE id = ?`,
+      `UPDATE todos SET task = ?, status = ? WHERE id = ?`,
       task,
-      id,
-      function (this: RunResult, err: Error) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(this.changes);
-        }
-      }
-    );
-  });
-}
-
-function updateTodoStatusInfo(id: number, status: boolean): Promise<number> {
-  return new Promise((resolve, reject) => {
-    db.run(
-      `UPDATE todos SET status = ? WHERE id = ?`,
       status,
       id,
       function (this: RunResult, err: Error) {

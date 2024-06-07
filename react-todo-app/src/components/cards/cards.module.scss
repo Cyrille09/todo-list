@@ -1,0 +1,116 @@
+@import "../../styles/variables";
+
+.cardSubtitle {
+  display: block;
+  text-transform: uppercase;
+  color: #8c98a4;
+  font-size: 0.65rem;
+  margin-bottom: 0.3rem;
+  position: relative;
+}
+
+.cardDivider {
+  border-left: 1px solid rgba(231, 234, 243, 0.7);
+  display: inline-block;
+  width: 1px;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.pButton {
+  margin-left: 10px;
+  color: blue;
+}
+.cButton {
+  margin-left: 10px;
+  color: green;
+}
+.rightSideShift {
+  padding-top: 10px;
+}
+
+.row {
+  padding: 0.7rem 0.9rem;
+  display: flex;
+  flex-wrap: nowrap;
+  border-top: 1px solid #e5e7eb;
+  margin: 0;
+  margin-top: -1px;
+}
+.row + .row {
+  border-top: 1px solid #e5e7eb;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: bold;
+  color: grey;
+  text-transform: uppercase;
+  flex: none;
+  width: 240px;
+  padding-right: 20px;
+}
+.value {
+  flex: 1;
+  padding: 0;
+}
+
+.formRow {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  flex-wrap: wrap;
+}
+.leftSide {
+  flex: 1;
+  text-transform: capitalize;
+}
+.rightSide {
+  flex: none;
+  width: auto;
+
+  button {
+    margin-left: 0.5em;
+  }
+}
+
+.tooltipIconHide {
+  display: none;
+  opacity: 0;
+}
+
+.tooltipIcon:hover + .tooltipIconHide {
+  display: block;
+  background-color: #132144;
+  border-radius: 0.5rem;
+  color: #fff;
+  line-height: 1.5;
+  text-align: center;
+  font-size: 0.76rem;
+  padding: 0.25rem 0.5rem;
+  max-width: 200px;
+  width: 200px;
+  word-wrap: break-word;
+  text-transform: none;
+  font-weight: 400;
+  position: absolute;
+  bottom: 175%;
+  opacity: 1;
+  left: 50%;
+  transform: translate(-50%, 0);
+  transition: opacity 0.2s;
+
+  &::before {
+    position: absolute;
+    content: "";
+    border-color: transparent;
+    border-style: solid;
+
+    bottom: -6px;
+    border-width: 0.4rem calc(0.8rem * 0.5) 0;
+    border-top-color: #132144;
+    margin-left: -4px;
+  }
+}

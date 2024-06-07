@@ -1,0 +1,23 @@
+@import "../../styles/variables";
+
+.top-level {
+  background: $secondary;
+  padding: 50px 0;
+  text-align: center;
+}
+.second-level {
+  margin-top: 50px;
+}
+
+.add-task {
+  // padding: 0 300px;
+  text-align: center;
+}
+
+.todo-list {
+  color: none;
+}
+
+.table-col-span {
+  text-align: center;
+}
