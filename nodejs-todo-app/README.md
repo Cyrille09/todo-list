@@ -1,3 +1,5 @@
+```bash
+
 ### redirect to the node.js task folder with the below command
 
 cd nodejs-todo-app
@@ -18,3 +20,5 @@ node initializeDatabase.js
 # run the task
 
 npn run run:dev
+
+```

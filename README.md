@@ -1,3 +1,4 @@
+```bash
 ### Clone the repo
 
 git clone https://github.com/Cyrille09/todo-list.git
@@ -43,3 +44,5 @@ REACT_APP_BASE_URL=http://localhost:5003/api
 # run the task
 
 npm start
+
+```
