@@ -65,6 +65,6 @@ npm start
 
 ![delete-all](https://github.com/Cyrille09/todo-list/assets/25312073/892f7f9a-333c-4b9b-8fc2-ccdd7defcd26)
 
-### Delete selected todo (s)
+### Delete selected todo's
 
 ![delete-selected](https://github.com/Cyrille09/todo-list/assets/25312073/31b25ebd-523e-4600-ae1a-8521b9f67bc0)
