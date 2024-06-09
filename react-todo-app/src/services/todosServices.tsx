@@ -33,5 +33,5 @@ export async function deleteTodos() {
 }
 
 export async function deleteSelectedTodos(todos: []) {
-  await axiosInterceptors.remove(`todos/selected`, todos);
+  await axiosInterceptors.post(`todos/selected`, todos);
 }

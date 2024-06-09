@@ -84,6 +84,45 @@ export const DeleteAllTodosModal = ({
   );
 };
 
+export const DeleteSelectedTodosModal = ({
+  footer,
+  show,
+  handleClose,
+  isLoading,
+  errorMessagePopup,
+}: {
+  footer?: any;
+  show: boolean;
+  handleClose: () => void;
+  isLoading: boolean;
+  errorMessagePopup: { status: boolean; message: string };
+}) => {
+  return (
+    <GlobalModal
+      title="Delete Selected Todos List"
+      show={show}
+      handleClose={handleClose}
+      footer={footer}
+    >
+      <div className={"global-modal"}>
+        {errorMessagePopup.status && (
+          <>
+            <GlobalErrorMessage
+              message={errorMessagePopup.message}
+              status={errorMessagePopup.status}
+            />
+          </>
+        )}
+        <p>Are you sure you want to delete the selected todo list?</p>
+
+        {isLoading && <LoadingData />}
+
+        {footer && <div className="global-modal-footer">{footer}</div>}
+      </div>
+    </GlobalModal>
+  );
+};
+
 /**
  * Edit todo list
  */

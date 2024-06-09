@@ -119,6 +119,19 @@ export const deleteTodos: RequestHandler = async (req, res, next) => {
   }
 };
 
+/**
+ * Delete todos
+ */
+export const deleteSelectedTodos: RequestHandler = async (req, res, next) => {
+  try {
+    const todos = await deleteSelectedTodosInfo(req.body);
+    if (!todos) return res.status(404).json({ message: "TODO NOT FOUND!" });
+    res.status(200).json({ message: "Selected Todos Deleted" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 function createTodoInfo(task: string): Promise<number> {
   return new Promise<number>((resolve, reject) => {
     db.run("INSERT INTO todos (task) VALUES (?)", task, function (err) {
@@ -140,7 +153,7 @@ function getTodosInfo(query: any): Promise<Todo[]> {
     db.all(
       `SELECT * FROM todos WHERE task LIKE '${filter}' 
         AND  status LIKE '${status}'
-        ORDER BY id ASC
+        ORDER BY id DESC
         LIMIT ${query.itemsPerPage}
         OFFSET ${offset}
         `,
@@ -202,6 +215,20 @@ function deleteTodoInfo(id: number): Promise<number> {
 function deleteTodosInfo(): Promise<number> {
   return new Promise((resolve, reject) => {
     db.run("DELETE FROM todos", function (err) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(this.changes);
+      }
+    });
+  });
+}
+
+function deleteSelectedTodosInfo(todos: []): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const placeholders = todos.map(() => "?").join(",");
+    const query = `DELETE FROM todos WHERE id IN (${placeholders})`;
+    db.run(query, todos, function (err) {
       if (err) {
         reject(err);
       } else {

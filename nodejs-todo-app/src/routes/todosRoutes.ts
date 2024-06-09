@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createTodo,
+  deleteSelectedTodos,
   deleteTodo,
   deleteTodos,
   getTodo,
@@ -15,6 +16,7 @@ router.get("/", getTodos);
 router.get("/:id", getTodo);
 router.patch("/:id", updateTodo);
 router.delete("/all", deleteTodos);
+router.post("/selected", deleteSelectedTodos);
 router.delete("/:id", deleteTodo);
 
 export default router;
