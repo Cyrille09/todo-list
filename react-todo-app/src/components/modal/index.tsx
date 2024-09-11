@@ -1,5 +1,6 @@
 import Modal from "react-bootstrap/Modal";
 import classnames from "classnames";
+import React from "react";
 
 // style components
 interface ModalProps {
@@ -17,10 +18,10 @@ interface ModalProps {
   footer?: any;
   title?: string;
   show: boolean;
-  handleClose: any;
+  handleClose: () => void;
   className?: any;
   titleClassName?: any;
-  children: any;
+  children: React.ReactNode;
 }
 
 export const GlobalModal = ({

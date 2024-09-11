@@ -59,7 +59,7 @@ const TodoList: React.FC = () => {
 
   const pageCount = Math.ceil(todos.total / todos.perPage);
 
-  const changePage = async ({ selected }: any) => {
+  const changePage = async ({ selected }: { selected: number }) => {
     navigate(
       `/?filter=${filterParam || ""}&status=${statusParam || ""}&page=${
         selected + 1
@@ -377,9 +377,10 @@ const TodoList: React.FC = () => {
                                     options={statusesForUpdate}
                                     label="Status"
                                     value={statusesForUpdate.find(
-                                      (c: any) => c.value === values.status
+                                      (c: { value: string }) =>
+                                        c.value === values.status
                                     )}
-                                    onChange={(selected: any) => {
+                                    onChange={(selected: { value: string }) => {
                                       if (selected.value) {
                                         setFieldValue(`status`, selected.value);
                                       }
@@ -585,9 +586,10 @@ const TodoList: React.FC = () => {
                                     required
                                     options={statuses}
                                     value={statuses.find(
-                                      (c: any) => c.value === values.status
+                                      (c: { value: string }) =>
+                                        c.value === values.status
                                     )}
-                                    onChange={(selected: any) => {
+                                    onChange={(selected: { value: string }) => {
                                       if (selected.value) {
                                         const status =
                                           selected.value === "all"
@@ -637,7 +639,7 @@ const TodoList: React.FC = () => {
                                     task: string;
                                     id: number;
                                     status: string;
-                                    date: any;
+                                    date: number | string;
                                   }) => (
                                     <tr key={todo.id} className="todo-list">
                                       <td>

@@ -1,14 +1,14 @@
 import { Field } from "formik";
 
 interface CheckboxProps {
-  type?: any;
+  type?: string;
   name?: string;
   id?: string;
-  value?: any;
-  onChangeCapture?: any;
-  select?: any;
-  onChange?: any;
-  onClick?: any;
+  value?: string;
+  onChangeCapture?: () => void;
+  select?: string;
+  onChange?: (value: {}) => void;
+  onClick?: () => void;
 }
 export function Checkbox({
   type,
