@@ -11,7 +11,7 @@ export function Pagination({
   perPage,
 }: {
   pageCount: number;
-  handlePageClick: any;
+  handlePageClick: (value: any) => void;
   forcePage: number;
   total: number;
   perPage: number;

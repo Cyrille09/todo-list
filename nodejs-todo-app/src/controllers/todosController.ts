@@ -13,7 +13,7 @@ interface Todo {
 /**
  * Get todos
  */
-export const getTodos: RequestHandler = async (req, res, next) => {
+export const getTodos: RequestHandler = async (req: any, res, next) => {
   try {
     const todos = await getTodosInfo(req.query);
     const todosCount = await getTodosInfoCount(req.query);
@@ -144,7 +144,12 @@ function createTodoInfo(task: string): Promise<number> {
   });
 }
 
-function getTodosInfo(query: any): Promise<Todo[]> {
+function getTodosInfo(query: {
+  filter: string;
+  status: boolean;
+  page: number;
+  itemsPerPage: number;
+}): Promise<Todo[]> {
   return new Promise<Todo[]>((resolve, reject) => {
     const filter = (query.filter && `%${query.filter}%`) || `%%`;
     const status = (query.status && `${query.status}`) || `%%`;
@@ -168,7 +173,10 @@ function getTodosInfo(query: any): Promise<Todo[]> {
   });
 }
 
-function getTodosInfoCount(query: any): Promise<Todo[]> {
+function getTodosInfoCount(query: {
+  filter: string;
+  status: boolean;
+}): Promise<Todo[]> {
   return new Promise<Todo[]>((resolve, reject) => {
     const filter = (query.filter && `%${query.filter}%`) || `%%`;
     const status = (query.status && `${query.status}`) || `%%`;

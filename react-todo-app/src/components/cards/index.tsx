@@ -3,6 +3,7 @@ import classnames from "classnames";
 // style components
 import styles from "./cards.module.scss";
 import "./box-shadow-card.scss";
+import React from "react";
 
 interface KeyValueCardProps {
   title: any;
@@ -11,7 +12,7 @@ interface KeyValueCardProps {
   vButton?: any;
   pButton?: any;
   cButton?: any;
-  children?: any;
+  children?: React.ReactNode;
   headerStyle?: any;
 }
 
@@ -54,7 +55,13 @@ export const KeyValueCard = ({
   );
 };
 
-export const RowCard = ({ children, className = "" }: any) => {
+export const RowCard = ({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className: any;
+}) => {
   return (
     <div className={`${styles.row} ${className}`}>
       <div className={styles.value}>{children}</div>
@@ -66,7 +73,7 @@ export const BoxShadowCard = ({
   children,
   className,
 }: {
-  children: any;
+  children: React.ReactNode;
   className?: any;
 }) => {
   return (
