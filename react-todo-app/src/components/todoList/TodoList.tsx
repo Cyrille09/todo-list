@@ -70,6 +70,8 @@ const TodoList: React.FC = () => {
   useEffect(() => {
     let isSubscribed = true;
     const getTodosList = () => {
+      setIsLoading(true);
+      resetErrorMessagePopup();
       getTodos({
         filter: filterParam || "",
         status: statusParam || "",
@@ -78,9 +80,16 @@ const TodoList: React.FC = () => {
         .then((response) => {
           if (isSubscribed) {
             setTodos(response.data);
+            closeModal();
           }
         })
-        .catch((error) => {});
+        .catch((error) => {
+          setErrorMessagePopup({
+            status: true,
+            message: ACTIONS_ERROR_MESSAGE,
+          });
+          setIsLoading(false);
+        });
     };
     getTodosList();
     return () => {
@@ -105,7 +114,7 @@ const TodoList: React.FC = () => {
     task: string;
     status: string;
   }) => {
-    setIsLoading(true);
+    resetErrorMessagePopup();
     await updateTodo(todo.id, todo)
       .then((response) => {
         getTodosData();
@@ -118,6 +127,7 @@ const TodoList: React.FC = () => {
   };
 
   const deleteAllTodosData = async () => {
+    resetErrorMessagePopup();
     setIsLoading(true);
     await deleteTodos()
       .then((response) => {
@@ -168,6 +178,10 @@ const TodoList: React.FC = () => {
     setErrorMessagePopup({ status: false, message: "" });
 
     setEditTodoModal(false);
+  };
+
+  const resetErrorMessagePopup = () => {
+    setErrorMessagePopup({ status: false, message: "" });
   };
 
   return (
@@ -240,6 +254,7 @@ const TodoList: React.FC = () => {
             };
 
             const addTodoData = async () => {
+              resetErrorMessagePopup();
               await addTodo(values)
                 .then((response) => {
                   setFieldValue("task", "");
@@ -346,6 +361,7 @@ const TodoList: React.FC = () => {
                               <div>
                                 {errorMessagePopup.status && (
                                   <>
+                                    <p>{errorMessagePopup.message}</p>
                                     <GlobalErrorMessage
                                       message={errorMessagePopup.message}
                                       status={errorMessagePopup.status}
@@ -485,7 +501,6 @@ const TodoList: React.FC = () => {
                               <GlobalButton
                                 onClick={() => {
                                   addTodoData();
-                                  // setTask(values.task);
                                 }}
                               >
                                 Add
@@ -540,6 +555,16 @@ const TodoList: React.FC = () => {
 
                 <div className="second-level">
                   <div className="container">
+                    <div className="error-message">
+                      {errorMessagePopup.status && (
+                        <>
+                          <GlobalErrorMessage
+                            message={errorMessagePopup.message}
+                            status={errorMessagePopup.status}
+                          />
+                        </>
+                      )}
+                    </div>
                     <div className="">
                       <div className="row">
                         <div className="">
@@ -663,11 +688,14 @@ const TodoList: React.FC = () => {
                                         />
                                       </td>
                                       <td>{todo.task}</td>
-                                      <td>
-                                        {todo.status === "active"
-                                          ? "Active"
-                                          : "Inactive"}
-                                      </td>
+                                      {todo.status === "active" ? (
+                                        <td>Active</td>
+                                      ) : (
+                                        <td style={{ color: "red" }}>
+                                          Inactive
+                                        </td>
+                                      )}
+
                                       <td>
                                         {format(
                                           new Date(todo.date),
