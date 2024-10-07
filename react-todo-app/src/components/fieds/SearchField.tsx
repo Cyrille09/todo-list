@@ -4,30 +4,29 @@ import classnames from "classnames";
 
 import { GlobalButton } from "../button/GlobalButton";
 import "./fields.scss";
+import React from "react";
 
 interface InputProps {
-  type?: any;
+  type?: string;
   name: string;
   id: string;
   placeholder?: string;
   label?: string;
   size?: string;
   disabled?: boolean;
-  className?: any;
+  className?: React.ReactNode;
   min?: number;
   required?: boolean;
   max?: number;
-  onBlur?: any;
-  autoCapitalize?: any;
-  onChange?: any;
-  autoCorrect?: any;
-  value?: any;
-  classNameLabel?: any;
-  error?: any;
-  style?: any;
-  onChangeCapture?: any;
-  onClick?: any;
-  onFocus?: any;
+  onBlur?: (value?: string | object) => void;
+  autoCapitalize?: string;
+  onChange?: (value: any) => void;
+  autoCorrect?: string;
+  classNameLabel?: React.ReactNode;
+  style?: React.CSSProperties;
+  onChangeCapture?: (value?: string | object) => void;
+  onClick?: React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement>;
+  onFocus?: (value?: string | object) => void;
   searchButtonSize?: "lg" | "xl" | "md" | "sm" | "xs" | "none";
 }
 

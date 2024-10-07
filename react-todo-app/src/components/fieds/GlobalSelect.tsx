@@ -9,15 +9,14 @@ interface SelectProps {
   id?: string;
   placeholder?: string;
   label?: string;
-  options?: any;
+  options?: object[];
   disabled?: boolean;
   disabledPlaceholder?: boolean;
-  option?: any;
-  style?: any;
-  onChange?: any;
-  onChangeCapture?: any;
-  className?: any;
-  value?: any;
+  style?: React.ReactNode;
+  onChange?: (event: any) => void;
+  onChangeCapture?: () => void;
+  className?: React.ReactNode;
+  value?: object;
   required?: boolean;
   isClearable?: boolean;
 }
