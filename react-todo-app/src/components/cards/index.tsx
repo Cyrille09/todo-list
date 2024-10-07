@@ -6,14 +6,14 @@ import "./box-shadow-card.scss";
 import React from "react";
 
 interface KeyValueCardProps {
-  title: any;
-  subTitle?: any;
-  filter?: any;
-  vButton?: any;
-  pButton?: any;
-  cButton?: any;
+  title: React.ReactNode;
+  subTitle?: string;
+  filter?: React.ReactNode;
+  vButton?: React.ReactNode;
+  pButton?: React.ReactNode;
+  cButton?: React.ReactNode;
   children?: React.ReactNode;
-  headerStyle?: any;
+  headerStyle?: React.CSSProperties;
 }
 
 export const KeyValueCard = ({
@@ -60,7 +60,7 @@ export const RowCard = ({
   className = "",
 }: {
   children: React.ReactNode;
-  className: any;
+  className: React.ReactNode;
 }) => {
   return (
     <div className={`${styles.row} ${className}`}>
@@ -74,7 +74,7 @@ export const BoxShadowCard = ({
   className,
 }: {
   children: React.ReactNode;
-  className?: any;
+  className?: React.ReactNode;
 }) => {
   return (
     <div className={classnames("box-shadow-main", className)}>

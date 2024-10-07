@@ -1,6 +1,7 @@
 import { GlobalModal } from "../modal";
 import { LoadingData } from "../loading";
 import { GlobalErrorMessage } from "../errorAndSuccessMessage";
+import React from "react";
 
 export const DeleteTodoModal = ({
   footer,
@@ -10,7 +11,7 @@ export const DeleteTodoModal = ({
   isLoading,
   errorMessagePopup,
 }: {
-  footer?: any;
+  footer?: React.ReactNode;
   show: boolean;
   handleClose: () => void;
   todo: { id: number; task: string; status: string };
@@ -18,12 +19,7 @@ export const DeleteTodoModal = ({
   errorMessagePopup: { status: boolean; message: string };
 }) => {
   return (
-    <GlobalModal
-      title="Delete Todo List"
-      show={show}
-      handleClose={handleClose}
-      footer={footer}
-    >
+    <GlobalModal title="Delete Todo List" show={show} handleClose={handleClose}>
       <div className={"global-modal"}>
         {errorMessagePopup.status && (
           <>
@@ -52,7 +48,7 @@ export const DeleteAllTodosModal = ({
   isLoading,
   errorMessagePopup,
 }: {
-  footer?: any;
+  footer?: React.ReactNode;
   show: boolean;
   handleClose: () => void;
   isLoading: boolean;
@@ -63,7 +59,6 @@ export const DeleteAllTodosModal = ({
       title="Delete All Todos List"
       show={show}
       handleClose={handleClose}
-      footer={footer}
     >
       <div className={"global-modal"}>
         {errorMessagePopup.status && (
@@ -91,7 +86,7 @@ export const DeleteSelectedTodosModal = ({
   isLoading,
   errorMessagePopup,
 }: {
-  footer?: any;
+  footer?: React.ReactNode;
   show: boolean;
   handleClose: () => void;
   isLoading: boolean;
@@ -102,7 +97,6 @@ export const DeleteSelectedTodosModal = ({
       title="Delete Selected Todos List"
       show={show}
       handleClose={handleClose}
-      footer={footer}
     >
       <div className={"global-modal"}>
         {errorMessagePopup.status && (
@@ -132,18 +126,13 @@ export const EditTodoModal = ({
   handleClose,
   formikData,
 }: {
-  footer?: any;
+  footer?: React.ReactNode;
   show: boolean;
   handleClose: () => void;
-  formikData: any;
+  formikData: React.ReactNode;
 }) => {
   return (
-    <GlobalModal
-      title="Update Todo List"
-      show={show}
-      handleClose={handleClose}
-      footer={footer}
-    >
+    <GlobalModal title="Update Todo List" show={show} handleClose={handleClose}>
       <div className={"global-modal"}>{formikData}</div>
     </GlobalModal>
   );

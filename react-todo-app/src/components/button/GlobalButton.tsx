@@ -28,13 +28,13 @@ interface ButtonProps {
   href?: string;
   target?: "_blank" | "_self" | "_parent" | "_top" | "framename";
   type?: "button" | "submit" | "reset";
-  leftIcon?: any;
-  rightIcon?: any;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
   disabled?: boolean;
   children?: React.ReactNode;
-  className?: any;
+  className?: React.ReactNode;
   to?: string;
-  style?: any;
+  style?: React.CSSProperties;
   onChange?: () => void;
   width?: "full-width" | "ajust";
   tag?: "main-tag" | "active-tag";

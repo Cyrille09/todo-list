@@ -6,27 +6,26 @@ import styles from "./fields.module.scss";
 // import "./fields.module.scss";
 
 interface InputProps {
-  type?: any;
+  type?: string;
   name: string;
   id: string;
   placeholder?: string;
   label?: string;
   size?: "lg" | "sm" | "default";
   disabled?: boolean;
-  className?: any;
+  className?: React.ReactDOM;
   min?: number;
   required?: boolean;
   max?: number;
-  onBlur?: any;
-  autoCapitalize?: any;
-  onChange?: any;
-  autoCorrect?: any;
-  value?: any;
-  classNameLabel?: any;
-  error?: any;
-  style?: any;
-  onChangeCapture?: any;
-  accept?: any;
+  onBlur?: (value?: string | object) => void;
+  autoCapitalize?: string;
+  onChange?: (value: any) => void;
+  autoCorrect?: string;
+  classNameLabel?: React.ReactDOM;
+  error?: React.ReactNode;
+  style?: React.CSSProperties;
+  onChangeCapture?: (value?: string | object) => void;
+  accept?: string;
 }
 
 export function InputField({

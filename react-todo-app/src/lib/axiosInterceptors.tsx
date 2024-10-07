@@ -1,4 +1,8 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import axios, {
+  AxiosInstance,
+  AxiosRequestConfig,
+  InternalAxiosRequestConfig,
+} from "axios";
 import { DEFAULT_TIMEOUT } from "../constants/defaultValues";
 
 const request: AxiosInstance = axios.create({
@@ -8,7 +12,7 @@ const request: AxiosInstance = axios.create({
 });
 
 request.interceptors.request.use(
-  async function (config: any) {
+  async function (config: InternalAxiosRequestConfig) {
     return config;
   },
 
@@ -18,7 +22,7 @@ request.interceptors.request.use(
 );
 
 export const appendArgsToUrl = (url: string, queryParams: any) => {
-  const queryString: any = [];
+  const queryString: string[] = [];
   Object.keys(queryParams).forEach(function (key) {
     if (queryParams[key] !== null) {
       queryString.push(`${key}=${encodeURIComponent(queryParams[key])}`);
@@ -32,15 +36,15 @@ export const appendArgsToUrl = (url: string, queryParams: any) => {
 
 function post(
   url: string,
-  data: {},
-  config?: AxiosRequestConfig<{}> | undefined
+  data: object,
+  config?: AxiosRequestConfig<object> | undefined
 ) {
   return request.post(url, data, config);
 }
 function get(
   url: string,
-  parameter: {},
-  config?: AxiosRequestConfig<{}> | undefined
+  parameter: object,
+  config?: AxiosRequestConfig<object> | undefined
 ) {
   const finalUrl = appendArgsToUrl(url, parameter);
   return request.get(finalUrl, config);
@@ -48,20 +52,20 @@ function get(
 
 function put(
   url: string,
-  data: {},
-  config?: AxiosRequestConfig<{}> | undefined
+  data: object,
+  config?: AxiosRequestConfig<object> | undefined
 ) {
   return request.put(url, data, config);
 }
 
-function remove(url: string, config?: AxiosRequestConfig<{}> | any) {
+function remove(url: string, config?: AxiosRequestConfig<object>) {
   return request.delete(url, config);
 }
 
 function patch(
   url: string,
-  data: {},
-  config?: AxiosRequestConfig<{}> | undefined
+  data: object,
+  config?: AxiosRequestConfig<object> | undefined
 ) {
   return request.patch(url, data, config);
 }

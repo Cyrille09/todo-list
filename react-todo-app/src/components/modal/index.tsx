@@ -15,12 +15,9 @@ interface ModalProps {
     | "lg-down"
     | "xl-down"
     | "xxl-down";
-  footer?: any;
   title?: string;
   show: boolean;
   handleClose: () => void;
-  className?: any;
-  titleClassName?: any;
   children: React.ReactNode;
 }
 
@@ -33,8 +30,6 @@ export const GlobalModal = ({
   title,
   show,
   handleClose,
-  className,
-  titleClassName,
   children,
 }: ModalProps) => {
   return (
@@ -48,9 +43,9 @@ export const GlobalModal = ({
         fullscreen={fullscreen}
         className={classnames(scrollable ? "modal-dialog-scrollable" : "")}
       >
-        <div className={className}>
+        <div>
           <Modal.Header closeButton>
-            <Modal.Title className={titleClassName}>{title}</Modal.Title>
+            <Modal.Title>{title}</Modal.Title>
           </Modal.Header>
           {children}
         </div>
