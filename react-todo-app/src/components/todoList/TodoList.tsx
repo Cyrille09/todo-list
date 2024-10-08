@@ -31,10 +31,17 @@ import { format } from "date-fns";
 import {
   GlobalErrorMessage,
   GlobalSuccessMessage,
-} from "../errorAndSuccessMessage";
+} from "../errorAndSuccessMessage/ErrorAndSuccessMessage";
 import { LoadingData } from "../loading";
 import { Checkbox } from "../fieds/checkbox";
 import { FaMinus, FaPlus } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../redux-toolkit/store";
+import {
+  showErrorPopup,
+  showIsLoading,
+  showSucessPopup,
+} from "../../redux-toolkit/reducers/popupSlice";
 
 const TodoList: React.FC = () => {
   const [todos, setTodos] = useState<any>({});
@@ -51,21 +58,15 @@ const TodoList: React.FC = () => {
   const [deleteAllTodosModal, setDeleteAllTodosModal] = useState(false);
   const [editTodoModal, setEditTodoModal] = useState(false);
   const [addMultipleTodoModal, setAddMultipleTodoModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessagePopup, setErrorMessagePopup] = useState<{
-    status: boolean;
-    message: string;
-  }>({ status: false, message: "" });
-  const [successMessagePopup, setSuccessMessagePopup] = useState<{
-    status: boolean;
-    message: string;
-  }>({ status: false, message: "shsh" });
-  const navigate = useNavigate();
 
   const searchParams = new URLSearchParams(window.location.search);
   const filterParam = searchParams.get("filter");
   const statusParam = searchParams.get("status");
   const pageParam = searchParams.get("page");
+
+  const popupSlice = useSelector((state: RootState) => state.popupSlice);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const pageCount = Math.ceil(todos.total / todos.perPage);
 
@@ -80,8 +81,7 @@ const TodoList: React.FC = () => {
   useEffect(() => {
     let isSubscribed = true;
     const getTodosList = () => {
-      setIsLoading(true);
-      resetErrorMessagePopup();
+      dispatch(showIsLoading(true));
       getTodos({
         filter: filterParam || "",
         status: statusParam || "",
@@ -90,22 +90,24 @@ const TodoList: React.FC = () => {
         .then((response) => {
           if (isSubscribed) {
             setTodos(response.data);
-            closeModal();
+            dispatch(showIsLoading(false));
           }
         })
         .catch((error) => {
-          setErrorMessagePopup({
-            status: true,
-            message: ACTIONS_ERROR_MESSAGE,
-          });
-          setIsLoading(false);
+          dispatch(
+            showErrorPopup({
+              status: true,
+              message: ACTIONS_ERROR_MESSAGE,
+            })
+          );
+          dispatch(showIsLoading(false));
         });
     };
     getTodosList();
     return () => {
       isSubscribed = false;
     };
-  }, [filterParam, pageParam, statusParam]);
+  }, [dispatch, filterParam, pageParam, statusParam]);
 
   const getTodosData = () => {
     getTodos({
@@ -126,31 +128,39 @@ const TodoList: React.FC = () => {
         let message = "Lists created successfully!";
         if (response.data.existedTasks.length)
           message = `Lists created successfully, but ${response.data.existedTasks}`;
-        setSuccessMessagePopup({
-          status: true,
-          message: `${message}`,
-        });
+        dispatch(
+          showSucessPopup({
+            status: true,
+            message: `${message}`,
+          })
+        );
         getTodosData();
         closeModal();
       })
       .catch((error) => {
         if (error.response.status === 409) {
-          setErrorMessagePopup({
-            status: true,
-            message: error.response.data.error,
-          });
+          dispatch(
+            showErrorPopup({
+              status: true,
+              message: error.response.data.error,
+            })
+          );
         } else if (error.response.status === 400) {
-          setErrorMessagePopup({
-            status: true,
-            message: error.response.data.error,
-          });
+          dispatch(
+            showErrorPopup({
+              status: true,
+              message: error.response.data.error,
+            })
+          );
         } else {
-          setErrorMessagePopup({
-            status: true,
-            message: ACTIONS_ERROR_MESSAGE,
-          });
+          dispatch(
+            showErrorPopup({
+              status: true,
+              message: ACTIONS_ERROR_MESSAGE,
+            })
+          );
         }
-        setIsLoading(false);
+        dispatch(showIsLoading(false));
       });
   };
 
@@ -159,52 +169,62 @@ const TodoList: React.FC = () => {
     task: string;
     status: string;
   }) => {
-    resetErrorMessagePopup();
     await updateTodo(todo.id, todo)
       .then((response) => {
-        setSuccessMessagePopup({
-          status: true,
-          message: "Task updated successfully!",
-        });
+        dispatch(
+          showSucessPopup({
+            status: true,
+            message: "Task updated successfully!",
+          })
+        );
         getTodosData();
         closeModal();
       })
       .catch((error) => {
         if (error.response.status === 409) {
-          setErrorMessagePopup({
-            status: true,
-            message: error.response.data.error,
-          });
+          dispatch(
+            showErrorPopup({
+              status: true,
+              message: error.response.data.error,
+            })
+          );
         } else if (error.response.status === 400) {
-          setErrorMessagePopup({
-            status: true,
-            message: error.response.data.error,
-          });
+          dispatch(
+            showErrorPopup({
+              status: true,
+              message: error.response.data.error,
+            })
+          );
         } else {
-          setErrorMessagePopup({
-            status: true,
-            message: ACTIONS_ERROR_MESSAGE,
-          });
+          dispatch(
+            showErrorPopup({
+              status: true,
+              message: ACTIONS_ERROR_MESSAGE,
+            })
+          );
         }
-        setIsLoading(false);
+        dispatch(showIsLoading(false));
       });
   };
 
   const deleteAllTodosData = async () => {
-    resetErrorMessagePopup();
-    setIsLoading(true);
+    dispatch(showIsLoading(true));
     deleteTodos()
       .then((response) => {
-        setSuccessMessagePopup({
-          status: true,
-          message: `All lists deleted successfully!`,
-        });
+        dispatch(
+          showSucessPopup({
+            status: true,
+            message: `All lists deleted successfully!`,
+          })
+        );
         getTodosData();
         closeModal();
       })
       .catch((error) => {
-        setErrorMessagePopup({ status: true, message: ACTIONS_ERROR_MESSAGE });
-        setIsLoading(false);
+        dispatch(
+          showErrorPopup({ status: true, message: ACTIONS_ERROR_MESSAGE })
+        );
+        dispatch(showIsLoading(false));
       });
   };
 
@@ -237,19 +257,15 @@ const TodoList: React.FC = () => {
   const closeModal = () => {
     setDeleteTodoModal(false);
     setDeleteAllTodosModal(false);
-    setIsLoading(false);
+    dispatch(showIsLoading(false));
     setTodo({
       id: 0,
       task: "",
       status: "",
     });
-    setErrorMessagePopup({ status: false, message: "" });
+    dispatch(showErrorPopup({ status: false, message: "" }));
     setEditTodoModal(false);
     setAddMultipleTodoModal(false);
-  };
-
-  const resetErrorMessagePopup = () => {
-    setErrorMessagePopup({ status: false, message: "" });
   };
 
   return (
@@ -276,7 +292,7 @@ const TodoList: React.FC = () => {
             errors,
           }) => {
             const deleteTodoData = async (id: number) => {
-              setIsLoading(true);
+              dispatch(showIsLoading(true));
               await deleteTodo(id)
                 .then((response) => {
                   const findTodo = values.selectedTaskIds.find(
@@ -291,74 +307,89 @@ const TodoList: React.FC = () => {
                     setFieldValue("selectedTaskIds", todoIds);
                   }
 
-                  setSuccessMessagePopup({
-                    status: true,
-                    message: `List deleted successfully!`,
-                  });
+                  dispatch(
+                    showSucessPopup({
+                      status: true,
+                      message: `List deleted successfully!`,
+                    })
+                  );
 
                   getTodosData();
                   closeModal();
                 })
                 .catch((error) => {
-                  setErrorMessagePopup({
-                    status: true,
-                    message: ACTIONS_ERROR_MESSAGE,
-                  });
-                  setIsLoading(false);
+                  dispatch(
+                    showErrorPopup({
+                      status: true,
+                      message: ACTIONS_ERROR_MESSAGE,
+                    })
+                  );
+                  dispatch(showIsLoading(false));
                 });
             };
 
             const deleteSelectedTodosData = async (values: []) => {
-              setIsLoading(true);
+              dispatch(showIsLoading(true));
               await deleteSelectedTodos(values)
                 .then((response) => {
-                  setSuccessMessagePopup({
-                    status: true,
-                    message: `Selected ${
-                      values.length > 1 ? "lists" : "list"
-                    }  deleted successfully!`,
-                  });
+                  dispatch(
+                    showSucessPopup({
+                      status: true,
+                      message: `Selected ${
+                        values.length > 1 ? "lists" : "list"
+                      }  deleted successfully!`,
+                    })
+                  );
                   getTodosData();
-                  setIsLoading(false);
+                  dispatch(showIsLoading(false));
                   setFieldValue("deleteSelectedTodosModal", false);
                   setFieldValue("selectedTaskIds", []);
                 })
                 .catch((error) => {
-                  setErrorMessagePopup({
-                    status: true,
-                    message: ACTIONS_ERROR_MESSAGE,
-                  });
-                  setIsLoading(false);
+                  dispatch(
+                    showErrorPopup({
+                      status: true,
+                      message: ACTIONS_ERROR_MESSAGE,
+                    })
+                  );
+                  dispatch(showIsLoading(false));
                 });
             };
 
             const addTodoData = async () => {
-              resetErrorMessagePopup();
               await addTodo(values)
                 .then((response) => {
-                  setSuccessMessagePopup({
-                    status: true,
-                    message: "Task added successfully!",
-                  });
+                  dispatch(
+                    showSucessPopup({
+                      status: true,
+                      message: "Task added successfully!",
+                    })
+                  );
                   setFieldValue("task", "");
                   getTodosData();
                 })
                 .catch((error) => {
                   if (error.response.status === 409) {
-                    setErrorMessagePopup({
-                      status: true,
-                      message: error.response.data.error,
-                    });
+                    dispatch(
+                      showErrorPopup({
+                        status: true,
+                        message: error.response.data.error,
+                      })
+                    );
                   } else if (error.response.status === 400) {
-                    setErrorMessagePopup({
-                      status: true,
-                      message: error.response.data.error,
-                    });
+                    dispatch(
+                      showErrorPopup({
+                        status: true,
+                        message: error.response.data.error,
+                      })
+                    );
                   } else {
-                    setErrorMessagePopup({
-                      status: true,
-                      message: ACTIONS_ERROR_MESSAGE,
-                    });
+                    dispatch(
+                      showErrorPopup({
+                        status: true,
+                        message: ACTIONS_ERROR_MESSAGE,
+                      })
+                    );
                   }
                 });
             };
@@ -371,8 +402,6 @@ const TodoList: React.FC = () => {
                       show={deleteTodoModal}
                       handleClose={closeModal}
                       todo={todo}
-                      isLoading={isLoading}
-                      errorMessagePopup={errorMessagePopup}
                       footer={
                         <>
                           <div className="global-modal-flex-row-wrap">
@@ -404,8 +433,6 @@ const TodoList: React.FC = () => {
                     <DeleteAllTodosModal
                       show={deleteAllTodosModal}
                       handleClose={closeModal}
-                      isLoading={isLoading}
-                      errorMessagePopup={errorMessagePopup}
                       footer={
                         <>
                           <div className="global-modal-flex-row-wrap">
@@ -454,15 +481,14 @@ const TodoList: React.FC = () => {
                           }) => (
                             <Form>
                               <div>
-                                {errorMessagePopup.status && (
+                                {popupSlice.errorPopup.status && (
                                   <>
                                     <GlobalErrorMessage
-                                      message={errorMessagePopup.message}
-                                      status={errorMessagePopup.status}
+                                      message={popupSlice.errorPopup.message}
                                     />
                                   </>
                                 )}
-                                {isLoading && <LoadingData />}
+                                {popupSlice.isLoading && <LoadingData />}
 
                                 <div style={{ marginBottom: 20 }}>
                                   <InputField
@@ -535,8 +561,6 @@ const TodoList: React.FC = () => {
                         closeModal();
                         setFieldValue("deleteSelectedTodosModal", false);
                       }}
-                      isLoading={isLoading}
-                      errorMessagePopup={errorMessagePopup}
                       footer={
                         <>
                           <div className="global-modal-flex-row-wrap">
@@ -793,11 +817,10 @@ const TodoList: React.FC = () => {
                 <div className="second-level">
                   <div className="container">
                     <div className="error-message">
-                      {errorMessagePopup.status && (
+                      {popupSlice.errorPopup.status && (
                         <>
                           <GlobalErrorMessage
-                            message={errorMessagePopup.message}
-                            status={errorMessagePopup.status}
+                            message={popupSlice.errorPopup.message}
                           />
                         </>
                       )}
@@ -806,11 +829,10 @@ const TodoList: React.FC = () => {
                     <div className="">
                       <div className="row">
                         <div className="success-message">
-                          {successMessagePopup.status && (
+                          {popupSlice.successPopup.status && (
                             <>
                               <GlobalSuccessMessage
-                                message={successMessagePopup.message}
-                                status={successMessagePopup.status}
+                                message={popupSlice.successPopup.message}
                               />
                             </>
                           )}

@@ -1,34 +1,34 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { CSSTransition } from "react-transition-group";
+import { DEFAULT_ERROR_SUCCESS_POPUP } from "../../constants/defaultValues";
+import {
+  showErrorPopup,
+  showSucessPopup,
+} from "../../redux-toolkit/reducers/popupSlice";
+// styles components
+import type { RootState } from "../../redux-toolkit/store";
+import { DefaultPopupMessage } from "../globalTypes/GlobalTypes";
 import styles from "./errorAndSuccessMessage.module.scss";
 
-export const GlobalErrorMessage = ({
-  message,
-  status,
-}: {
-  message: string;
-  status: boolean;
-}) => {
+export const GlobalErrorMessage = ({ message }: { message: string }) => {
   const nodeRef = useRef(null);
-  const [errorPopup, setErrorPopup] = useState<{
-    status: boolean;
-    message: string;
-    display: string;
-  }>({ status, message: "", display: "" });
+  const dispatch = useDispatch();
+  const actions = useSelector((state: RootState) => state.popupSlice);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setErrorPopup({ status: false, message: "", display: "" });
-    }, 2000);
+      dispatch(showErrorPopup({ ...DefaultPopupMessage }));
+    }, DEFAULT_ERROR_SUCCESS_POPUP);
 
     return () => {
       clearTimeout(timer);
     };
-  }, []);
+  }, [dispatch]);
 
   return (
     <CSSTransition
-      in={errorPopup.status}
+      in={actions.errorPopup.status}
       nodeRef={nodeRef}
       timeout={100}
       classNames="panel-animate"
@@ -46,33 +46,24 @@ export const GlobalErrorMessage = ({
   );
 };
 
-export const GlobalSuccessMessage = ({
-  message,
-  status,
-}: {
-  message: string;
-  status: boolean;
-}) => {
+export const GlobalSuccessMessage = ({ message }: { message: string }) => {
   const nodeRef = useRef(null);
-  const [successPopup, setSuccessPopup] = useState<{
-    status: boolean;
-    message: string;
-    display: string;
-  }>({ status, message: "", display: "" });
+  const dispatch = useDispatch();
+  const actions = useSelector((state: RootState) => state.popupSlice);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setSuccessPopup({ status: false, message: "", display: "" });
-    }, 2000);
+      dispatch(showSucessPopup({ ...DefaultPopupMessage }));
+    }, DEFAULT_ERROR_SUCCESS_POPUP);
 
     return () => {
       clearTimeout(timer);
     };
-  }, []);
+  }, [dispatch]);
 
   return (
     <CSSTransition
-      in={successPopup.status}
+      in={actions.successPopup.status}
       nodeRef={nodeRef}
       timeout={100}
       classNames="panel-animate"

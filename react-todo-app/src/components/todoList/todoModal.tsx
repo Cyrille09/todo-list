@@ -1,7 +1,9 @@
 import { GlobalModal } from "../modal";
 import { LoadingData } from "../loading";
-import { GlobalErrorMessage } from "../errorAndSuccessMessage";
+import { GlobalErrorMessage } from "../errorAndSuccessMessage/ErrorAndSuccessMessage";
 import React from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux-toolkit/store";
 
 /**
  * Delete todo list
@@ -11,32 +13,26 @@ export const DeleteTodoModal = ({
   show,
   handleClose,
   todo,
-  isLoading,
-  errorMessagePopup,
 }: {
   footer?: React.ReactNode;
   show: boolean;
   handleClose: () => void;
   todo: { id: number; task: string; status: string };
-  isLoading: boolean;
-  errorMessagePopup: { status: boolean; message: string };
 }) => {
+  const popupSlice = useSelector((state: RootState) => state.popupSlice);
   return (
     <GlobalModal title="Delete Todo List" show={show} handleClose={handleClose}>
       <div className={"global-modal"}>
-        {errorMessagePopup.status && (
+        {popupSlice.errorPopup.status && (
           <>
-            <GlobalErrorMessage
-              message={errorMessagePopup.message}
-              status={errorMessagePopup.status}
-            />
+            <GlobalErrorMessage message={popupSlice.errorPopup.message} />
           </>
         )}
         <p>
           Are you sure you want to delete <b>{todo.task}</b> todo list?
         </p>
 
-        {isLoading && <LoadingData />}
+        {popupSlice.isLoading && <LoadingData />}
 
         {footer && <div className="global-modal-footer">{footer}</div>}
       </div>
@@ -51,15 +47,12 @@ export const DeleteAllTodosModal = ({
   footer,
   show,
   handleClose,
-  isLoading,
-  errorMessagePopup,
 }: {
   footer?: React.ReactNode;
   show: boolean;
   handleClose: () => void;
-  isLoading: boolean;
-  errorMessagePopup: { status: boolean; message: string };
 }) => {
+  const popupSlice = useSelector((state: RootState) => state.popupSlice);
   return (
     <GlobalModal
       title="Delete All Todos List"
@@ -67,17 +60,14 @@ export const DeleteAllTodosModal = ({
       handleClose={handleClose}
     >
       <div className={"global-modal"}>
-        {errorMessagePopup.status && (
+        {popupSlice.errorPopup.status && (
           <>
-            <GlobalErrorMessage
-              message={errorMessagePopup.message}
-              status={errorMessagePopup.status}
-            />
+            <GlobalErrorMessage message={popupSlice.errorPopup.message} />
           </>
         )}
         <p>Are you sure you want to delete all todo list?</p>
 
-        {isLoading && <LoadingData />}
+        {popupSlice.isLoading && <LoadingData />}
 
         {footer && <div className="global-modal-footer">{footer}</div>}
       </div>
@@ -92,15 +82,12 @@ export const DeleteSelectedTodosModal = ({
   footer,
   show,
   handleClose,
-  isLoading,
-  errorMessagePopup,
 }: {
   footer?: React.ReactNode;
   show: boolean;
   handleClose: () => void;
-  isLoading: boolean;
-  errorMessagePopup: { status: boolean; message: string };
 }) => {
+  const popupSlice = useSelector((state: RootState) => state.popupSlice);
   return (
     <GlobalModal
       title="Delete Selected Todos List"
@@ -108,17 +95,14 @@ export const DeleteSelectedTodosModal = ({
       handleClose={handleClose}
     >
       <div className={"global-modal"}>
-        {errorMessagePopup.status && (
+        {popupSlice.errorPopup.status && (
           <>
-            <GlobalErrorMessage
-              message={errorMessagePopup.message}
-              status={errorMessagePopup.status}
-            />
+            <GlobalErrorMessage message={popupSlice.errorPopup.message} />
           </>
         )}
         <p>Are you sure you want to delete the selected todo list?</p>
 
-        {isLoading && <LoadingData />}
+        {popupSlice.isLoading && <LoadingData />}
 
         {footer && <div className="global-modal-footer">{footer}</div>}
       </div>
