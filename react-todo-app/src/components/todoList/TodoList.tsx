@@ -123,16 +123,33 @@ const TodoList: React.FC = () => {
     const tasks = values.tasks.filter((task: string) => task.length);
     addTodos(tasks)
       .then((response) => {
+        let message = "Lists created successfully!";
+        if (response.data.existedTasks.length)
+          message = `Lists created successfully, but ${response.data.existedTasks}`;
         setSuccessMessagePopup({
           status: true,
-          message: `Lists created successfully!`,
+          message: `${message}`,
         });
         getTodosData();
         closeModal();
       })
       .catch((error) => {
-        console.log(error);
-        setErrorMessagePopup({ status: true, message: ACTIONS_ERROR_MESSAGE });
+        if (error.response.status === 409) {
+          setErrorMessagePopup({
+            status: true,
+            message: error.response.data.error,
+          });
+        } else if (error.response.status === 400) {
+          setErrorMessagePopup({
+            status: true,
+            message: error.response.data.error,
+          });
+        } else {
+          setErrorMessagePopup({
+            status: true,
+            message: ACTIONS_ERROR_MESSAGE,
+          });
+        }
         setIsLoading(false);
       });
   };
@@ -145,11 +162,30 @@ const TodoList: React.FC = () => {
     resetErrorMessagePopup();
     await updateTodo(todo.id, todo)
       .then((response) => {
+        setSuccessMessagePopup({
+          status: true,
+          message: "Task updated successfully!",
+        });
         getTodosData();
         closeModal();
       })
       .catch((error) => {
-        setErrorMessagePopup({ status: true, message: ACTIONS_ERROR_MESSAGE });
+        if (error.response.status === 409) {
+          setErrorMessagePopup({
+            status: true,
+            message: error.response.data.error,
+          });
+        } else if (error.response.status === 400) {
+          setErrorMessagePopup({
+            status: true,
+            message: error.response.data.error,
+          });
+        } else {
+          setErrorMessagePopup({
+            status: true,
+            message: ACTIONS_ERROR_MESSAGE,
+          });
+        }
         setIsLoading(false);
       });
   };
@@ -302,16 +338,28 @@ const TodoList: React.FC = () => {
                 .then((response) => {
                   setSuccessMessagePopup({
                     status: true,
-                    message: "List added successfully!",
+                    message: "Task added successfully!",
                   });
                   setFieldValue("task", "");
                   getTodosData();
                 })
                 .catch((error) => {
-                  setErrorMessagePopup({
-                    status: true,
-                    message: ACTIONS_ERROR_MESSAGE,
-                  });
+                  if (error.response.status === 409) {
+                    setErrorMessagePopup({
+                      status: true,
+                      message: error.response.data.error,
+                    });
+                  } else if (error.response.status === 400) {
+                    setErrorMessagePopup({
+                      status: true,
+                      message: error.response.data.error,
+                    });
+                  } else {
+                    setErrorMessagePopup({
+                      status: true,
+                      message: ACTIONS_ERROR_MESSAGE,
+                    });
+                  }
                 });
             };
 
@@ -408,7 +456,6 @@ const TodoList: React.FC = () => {
                               <div>
                                 {errorMessagePopup.status && (
                                   <>
-                                    <p>{errorMessagePopup.message}</p>
                                     <GlobalErrorMessage
                                       message={errorMessagePopup.message}
                                       status={errorMessagePopup.status}
@@ -571,7 +618,10 @@ const TodoList: React.FC = () => {
                                               />
                                             </div>
 
-                                            <div className="col-sm-2">
+                                            <div
+                                              className="col-sm-2"
+                                              style={{ textAlign: "right" }}
+                                            >
                                               <div>
                                                 {values.tasks.length ===
                                                 index + 1 ? (
@@ -675,6 +725,7 @@ const TodoList: React.FC = () => {
                                 onClick={() => {
                                   addTodoData();
                                 }}
+                                disabled={values.task ? false : true}
                               >
                                 Add
                               </GlobalButton>

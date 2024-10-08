@@ -36,6 +36,13 @@ export const createTodo: RequestHandler = async (req, res, next) => {
   if (!req.body.task)
     return res.status(400).json({ error: "task is require!" });
 
+  const todo = await getTodoInfo({ task: req.body.task });
+
+  if (todo)
+    return res
+      .status(409)
+      .json({ error: `${req.body.task} task already exist!` });
+
   try {
     const task = req.body.task.trim();
 
@@ -49,14 +56,33 @@ export const createTodo: RequestHandler = async (req, res, next) => {
 /**
  * Create todos
  */
-export const createTodos: RequestHandler = async (req, res, next) => {
-  console.log(req.body);
+export const createTodos: RequestHandler = async (req: any, res, next) => {
   if (!req.body.tasks.length)
-    return res.status(400).json({ error: "at least one task is require!" });
+    return res.status(400).json({ error: "At least one task is require!" });
+
+  const todos = await getTodosInfoWithoutQuery();
+  const todo = todos.map((todo: { task: string }) => todo.task);
+  const tasks = req.body.tasks.filter((task: string) => !todo.includes(task));
+  const existedTasks = req.body.tasks.filter((task: string) =>
+    todo.includes(task)
+  );
+
+  const joinExistedTasks =
+    existedTasks.length > 1
+      ? `${existedTasks.slice(0, -1).join(", ")} and ${existedTasks.slice(-1)}`
+      : existedTasks[0];
+
+  if (!tasks.length)
+    return res
+      .status(409)
+      .json({ error: `${joinExistedTasks} already exist!` });
 
   try {
-    const result = createTodosInfo(req.body.tasks);
-    res.status(201).json({ result });
+    const result = createTodosInfo(tasks);
+    res.status(201).json({
+      result,
+      existedTasks: `${joinExistedTasks} task already exist!`,
+    });
   } catch (error) {
     next(error);
   }
@@ -71,7 +97,7 @@ export const getTodo: RequestHandler<{ id: number }> = async (
   next
 ) => {
   try {
-    const todo = await getTodoInfo(req.params.id);
+    const todo = await getTodoInfo({ id: req.params.id });
 
     if (!todo) return res.status(404).json({ message: "TODO NOT FOUND!" });
 
@@ -87,7 +113,17 @@ export const getTodo: RequestHandler<{ id: number }> = async (
 export const updateTodo: RequestHandler = async (req, res, next) => {
   try {
     if (!req.body.task)
-      return res.status(400).json({ error: "task is require!" });
+      return res.status(400).json({ error: "Task is require!" });
+
+    const updateTodo = await getUpdateTodoInfo(
+      parseInt(req.params.id, 10),
+      req.body.task
+    );
+
+    if (updateTodo)
+      return res
+        .status(409)
+        .json({ error: `${updateTodo.task} task already exist!` });
 
     const todo = await updateTodoInfo(
       parseInt(req.params.id, 10),
@@ -97,7 +133,7 @@ export const updateTodo: RequestHandler = async (req, res, next) => {
 
     if (!todo) return res.status(404).json({ message: "TODO NOT FOUND!" });
 
-    const todoInfo = await getTodoInfo(parseInt(req.params.id, 10));
+    const todoInfo = await getTodoInfo({ id: parseInt(req.params.id, 10) });
 
     res.status(200).json(todoInfo);
   } catch (error) {
@@ -204,6 +240,18 @@ function getTodosInfo(query: {
   });
 }
 
+function getTodosInfoWithoutQuery(): Promise<Todo[]> {
+  return new Promise<Todo[]>((resolve, reject) => {
+    db.all(`SELECT * FROM todos`, (err, rows: Todo[]) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+}
+
 function getTodosInfoCount(query: {
   filter: string;
   status: boolean;
@@ -227,13 +275,48 @@ function getTodosInfoCount(query: {
   });
 }
 
-function getTodoInfo(id: number): Promise<Todo> {
-  return new Promise<Todo>((resolve, reject) => {
-    db.get("SELECT * FROM todos WHERE id = ?", id, (err, rows: Todo) => {
+function getTodoInfo(params: {
+  id?: number;
+  task?: string;
+}): Promise<Todo | null> {
+  return new Promise<Todo | null>((resolve, reject) => {
+    let query = "SELECT * FROM todos WHERE ";
+    const queryParams: (number | string)[] = [];
+
+    if (params.id) {
+      query += "id = ?";
+      queryParams.push(params.id);
+    } else if (params.task) {
+      query += "LOWER(task) = ?";
+      queryParams.push(params.task.toLowerCase());
+    } else {
+      return reject(new Error("You must provide either an id or a task"));
+    }
+
+    db.get(query, queryParams, (err, row: Todo | undefined) => {
       if (err) {
         reject(err);
       } else {
-        resolve(rows);
+        resolve(row || null);
+      }
+    });
+  });
+}
+
+function getUpdateTodoInfo(id: number, task: string): Promise<Todo | null> {
+  return new Promise<Todo | null>((resolve, reject) => {
+    const query = `
+      SELECT * FROM todos 
+      WHERE LOWER(task) = ? 
+      AND id != ?
+    `;
+    const queryParams: (number | string)[] = [task.toLowerCase(), id];
+
+    db.get(query, queryParams, (err, row: Todo | undefined) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(row || null);
       }
     });
   });
