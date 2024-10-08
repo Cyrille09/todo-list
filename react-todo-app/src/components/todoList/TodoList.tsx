@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   addTodo,
+  addTodos,
   deleteSelectedTodos,
   deleteTodo,
   deleteTodos,
@@ -8,7 +9,7 @@ import {
   updateTodo,
 } from "../../services/todosServices";
 import "./todoList.scss";
-import { Form, Formik } from "formik";
+import { FieldArray, Form, Formik } from "formik";
 import { useNavigate } from "react-router-dom";
 import { InputField } from "../fieds/inputField";
 import { GlobalButton } from "../button/GlobalButton";
@@ -19,6 +20,7 @@ import { ReactSelect } from "../fieds/GlobalSelect";
 import { SearchField } from "../fieds/SearchField";
 import { Pagination } from "../pagination/pagination";
 import {
+  AddMultipleTodoModal,
   DeleteAllTodosModal,
   DeleteSelectedTodosModal,
   DeleteTodoModal,
@@ -26,9 +28,13 @@ import {
 } from "./todoModal";
 import { ACTIONS_ERROR_MESSAGE } from "../../constants/globalText";
 import { format } from "date-fns";
-import { GlobalErrorMessage } from "../errorAndSuccessMessage";
+import {
+  GlobalErrorMessage,
+  GlobalSuccessMessage,
+} from "../errorAndSuccessMessage";
 import { LoadingData } from "../loading";
 import { Checkbox } from "../fieds/checkbox";
+import { FaMinus, FaPlus } from "react-icons/fa";
 
 const TodoList: React.FC = () => {
   const [todos, setTodos] = useState<any>({});
@@ -43,13 +49,17 @@ const TodoList: React.FC = () => {
   });
   const [deleteTodoModal, setDeleteTodoModal] = useState(false);
   const [deleteAllTodosModal, setDeleteAllTodosModal] = useState(false);
-
   const [editTodoModal, setEditTodoModal] = useState(false);
+  const [addMultipleTodoModal, setAddMultipleTodoModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessagePopup, setErrorMessagePopup] = useState<{
     status: boolean;
     message: string;
   }>({ status: false, message: "" });
+  const [successMessagePopup, setSuccessMessagePopup] = useState<{
+    status: boolean;
+    message: string;
+  }>({ status: false, message: "shsh" });
   const navigate = useNavigate();
 
   const searchParams = new URLSearchParams(window.location.search);
@@ -109,6 +119,24 @@ const TodoList: React.FC = () => {
       .catch((error) => {});
   };
 
+  const addMultipleTodoData = async (values: { tasks: string[] }) => {
+    const tasks = values.tasks.filter((task: string) => task.length);
+    addTodos(tasks)
+      .then((response) => {
+        setSuccessMessagePopup({
+          status: true,
+          message: `Lists created successfully!`,
+        });
+        getTodosData();
+        closeModal();
+      })
+      .catch((error) => {
+        console.log(error);
+        setErrorMessagePopup({ status: true, message: ACTIONS_ERROR_MESSAGE });
+        setIsLoading(false);
+      });
+  };
+
   const editTodoData = async (todo: {
     id: number;
     task: string;
@@ -129,8 +157,12 @@ const TodoList: React.FC = () => {
   const deleteAllTodosData = async () => {
     resetErrorMessagePopup();
     setIsLoading(true);
-    await deleteTodos()
+    deleteTodos()
       .then((response) => {
+        setSuccessMessagePopup({
+          status: true,
+          message: `All lists deleted successfully!`,
+        });
         getTodosData();
         closeModal();
       })
@@ -176,8 +208,8 @@ const TodoList: React.FC = () => {
       status: "",
     });
     setErrorMessagePopup({ status: false, message: "" });
-
     setEditTodoModal(false);
+    setAddMultipleTodoModal(false);
   };
 
   const resetErrorMessagePopup = () => {
@@ -223,6 +255,11 @@ const TodoList: React.FC = () => {
                     setFieldValue("selectedTaskIds", todoIds);
                   }
 
+                  setSuccessMessagePopup({
+                    status: true,
+                    message: `List deleted successfully!`,
+                  });
+
                   getTodosData();
                   closeModal();
                 })
@@ -239,6 +276,12 @@ const TodoList: React.FC = () => {
               setIsLoading(true);
               await deleteSelectedTodos(values)
                 .then((response) => {
+                  setSuccessMessagePopup({
+                    status: true,
+                    message: `Selected ${
+                      values.length > 1 ? "lists" : "list"
+                    }  deleted successfully!`,
+                  });
                   getTodosData();
                   setIsLoading(false);
                   setFieldValue("deleteSelectedTodosModal", false);
@@ -257,6 +300,10 @@ const TodoList: React.FC = () => {
               resetErrorMessagePopup();
               await addTodo(values)
                 .then((response) => {
+                  setSuccessMessagePopup({
+                    status: true,
+                    message: "List added successfully!",
+                  });
                   setFieldValue("task", "");
                   getTodosData();
                 })
@@ -479,6 +526,132 @@ const TodoList: React.FC = () => {
                       }
                     />
                   )}
+
+                  {addMultipleTodoModal && (
+                    <AddMultipleTodoModal
+                      show={addMultipleTodoModal}
+                      handleClose={() => closeModal()}
+                      formikData={
+                        <Formik
+                          initialValues={{ tasks: [""] }}
+                          onSubmit={addMultipleTodoData}
+                        >
+                          {({
+                            handleChange,
+                            handleBlur,
+                            setFieldValue,
+                            values,
+                            errors,
+                          }) => (
+                            <Form>
+                              <div>
+                                <FieldArray
+                                  name="tasks"
+                                  render={(arrayHelpers) => {
+                                    return (
+                                      <div>
+                                        {values.tasks.map((task, index) => (
+                                          <div
+                                            key={index}
+                                            className="row add-tasks"
+                                          >
+                                            <div className="col-sm-10">
+                                              <InputField
+                                                style={{ borderRadius: 0 }}
+                                                placeholder="Task"
+                                                name={`tasks.${index}`}
+                                                id={`tasks.${index}`}
+                                                onBlur={handleBlur(
+                                                  `tasks.${index}`
+                                                )}
+                                                autoCapitalize="none"
+                                                onChange={handleChange(
+                                                  `tasks.${index}`
+                                                )}
+                                              />
+                                            </div>
+
+                                            <div className="col-sm-2">
+                                              <div>
+                                                {values.tasks.length ===
+                                                index + 1 ? (
+                                                  <GlobalButton
+                                                    disabled={
+                                                      values.tasks[index]
+                                                        ? false
+                                                        : true
+                                                    }
+                                                    onClick={() => {
+                                                      if (values.tasks.length) {
+                                                        arrayHelpers.insert(
+                                                          values.tasks.length +
+                                                            1,
+                                                          ""
+                                                        );
+                                                      } else {
+                                                        arrayHelpers.push("");
+                                                      }
+                                                    }}
+                                                  >
+                                                    <FaPlus />
+                                                  </GlobalButton>
+                                                ) : (
+                                                  <GlobalButton
+                                                    onClick={() => {
+                                                      arrayHelpers.remove(
+                                                        index
+                                                      );
+                                                    }}
+                                                    format="danger"
+                                                  >
+                                                    <FaMinus />
+                                                  </GlobalButton>
+                                                )}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        ))}
+                                        <div
+                                          className="global-modal-flex-row-wrap"
+                                          style={{ marginTop: 30 }}
+                                        >
+                                          <div className="global-modal-left">
+                                            <GlobalButton
+                                              format="white"
+                                              size="sm"
+                                              onClick={() => closeModal()}
+                                            >
+                                              Cancel
+                                            </GlobalButton>
+                                          </div>
+                                          <div>
+                                            <GlobalButton
+                                              format="success"
+                                              type="submit"
+                                              size="sm"
+                                              disabled={
+                                                values.tasks.filter(
+                                                  (task: string) => task.length
+                                                ).length
+                                                  ? false
+                                                  : true
+                                              }
+                                            >
+                                              Submit
+                                            </GlobalButton>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  }}
+                                />
+                              </div>
+                            </Form>
+                          )}
+                        </Formik>
+                      }
+                    />
+                  )}
                 </div>
 
                 <div className="top-level">
@@ -512,16 +685,29 @@ const TodoList: React.FC = () => {
                               className="col-sm-4"
                               style={{ textAlign: "right" }}
                             >
-                              <GlobalButton
-                                size="sm"
-                                format="danger"
-                                onClick={() => {
-                                  setDeleteAllTodosModal(true);
-                                  navigate("/");
-                                }}
-                              >
-                                Delete All
-                              </GlobalButton>
+                              <span style={{ marginRight: 20 }}>
+                                <GlobalButton
+                                  size="sm"
+                                  onClick={() => {
+                                    setAddMultipleTodoModal(true);
+                                    // navigate("/");
+                                  }}
+                                >
+                                  Add Multiple
+                                </GlobalButton>
+                              </span>
+                              <span>
+                                <GlobalButton
+                                  size="sm"
+                                  format="danger"
+                                  onClick={() => {
+                                    setDeleteAllTodosModal(true);
+                                    navigate("/");
+                                  }}
+                                >
+                                  Delete All
+                                </GlobalButton>
+                              </span>
                             </div>
                           )) ||
                             null}
@@ -565,9 +751,20 @@ const TodoList: React.FC = () => {
                         </>
                       )}
                     </div>
+
                     <div className="">
                       <div className="row">
-                        <div className="">
+                        <div className="success-message">
+                          {successMessagePopup.status && (
+                            <>
+                              <GlobalSuccessMessage
+                                message={successMessagePopup.message}
+                                status={successMessagePopup.status}
+                              />
+                            </>
+                          )}
+                        </div>
+                        <div className="col-sm-12">
                           <KeyValueCard
                             headerStyle={{
                               background: "black",

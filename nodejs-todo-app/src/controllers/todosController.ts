@@ -47,6 +47,22 @@ export const createTodo: RequestHandler = async (req, res, next) => {
 };
 
 /**
+ * Create todos
+ */
+export const createTodos: RequestHandler = async (req, res, next) => {
+  console.log(req.body);
+  if (!req.body.tasks.length)
+    return res.status(400).json({ error: "at least one task is require!" });
+
+  try {
+    const result = createTodosInfo(req.body.tasks);
+    res.status(201).json({ result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * Get todo
  */
 export const getTodo: RequestHandler<{ id: number }> = async (
@@ -140,6 +156,21 @@ function createTodoInfo(task: string): Promise<number> {
       } else {
         resolve(this.lastID);
       }
+    });
+  });
+}
+
+function createTodosInfo(tasks: string[]) {
+  tasks.forEach((task) => {
+    return new Promise<number>((resolve, reject) => {
+      const query = `INSERT INTO todos (task) VALUES (?)`;
+      db.run(query, [task], (err) => {
+        if (err) {
+          console.error(`Error inserting task ${task}:`, err);
+        } else {
+          console.log(`Task ${task} inserted successfully`);
+        }
+      });
     });
   });
 }

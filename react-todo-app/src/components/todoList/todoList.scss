@@ -10,8 +10,11 @@
 }
 
 .add-task {
-  // padding: 0 300px;
   text-align: center;
+}
+
+.add-tasks {
+  margin-bottom: 20px;
 }
 
 .todo-list {
@@ -23,5 +26,9 @@
 }
 
 .error-message {
+  margin-bottom: 20px;
+}
+
+.success-message {
   margin-bottom: 20px;
 }

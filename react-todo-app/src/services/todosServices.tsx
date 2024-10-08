@@ -17,6 +17,10 @@ export async function addTodo(data: { task: string }) {
   return await axiosInterceptors.post(`todos`, data);
 }
 
+export async function addTodos(tasks: string[]) {
+  return await axiosInterceptors.post(`todos/multiple`, { tasks });
+}
+
 export async function updateTodo(
   id: number,
   data: { task: string; status: string }

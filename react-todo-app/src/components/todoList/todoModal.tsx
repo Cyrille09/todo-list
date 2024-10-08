@@ -3,6 +3,9 @@ import { LoadingData } from "../loading";
 import { GlobalErrorMessage } from "../errorAndSuccessMessage";
 import React from "react";
 
+/**
+ * Delete todo list
+ */
 export const DeleteTodoModal = ({
   footer,
   show,
@@ -41,6 +44,9 @@ export const DeleteTodoModal = ({
   );
 };
 
+/**
+ * Delete all todos list
+ */
 export const DeleteAllTodosModal = ({
   footer,
   show,
@@ -79,6 +85,9 @@ export const DeleteAllTodosModal = ({
   );
 };
 
+/**
+ * Delete selected todo list
+ */
 export const DeleteSelectedTodosModal = ({
   footer,
   show,
@@ -113,6 +122,29 @@ export const DeleteSelectedTodosModal = ({
 
         {footer && <div className="global-modal-footer">{footer}</div>}
       </div>
+    </GlobalModal>
+  );
+};
+
+/**
+ * Add multiple todo list
+ */
+export const AddMultipleTodoModal = ({
+  show,
+  handleClose,
+  formikData,
+}: {
+  show: boolean;
+  handleClose: () => void;
+  formikData: React.ReactNode;
+}) => {
+  return (
+    <GlobalModal
+      title="Add Multiple Todos List"
+      show={show}
+      handleClose={handleClose}
+    >
+      <div className={"global-modal"}>{formikData}</div>
     </GlobalModal>
   );
 };
