@@ -9,12 +9,22 @@ export interface ActionsState {
   successPopup: PopupMessageInterface;
   errorPopup: PopupMessageInterface;
   isLoading: boolean;
+  deleteTodoPopup: boolean;
+  deleteTodosPopup: boolean;
+  editTodoPopup: boolean;
+  addTodosPopup: boolean;
+  deleteSelectedTodosPopup: boolean;
 }
 
 const initialState: ActionsState = {
   successPopup: DefaultPopupMessage,
   errorPopup: DefaultPopupMessage,
   isLoading: false,
+  deleteTodoPopup: false,
+  deleteTodosPopup: false,
+  editTodoPopup: false,
+  addTodosPopup: false,
+  deleteSelectedTodosPopup: false,
 };
 
 export const popupSlice: Slice<ActionsState> = createSlice({
@@ -30,16 +40,43 @@ export const popupSlice: Slice<ActionsState> = createSlice({
     showErrorPopup: (state, action: PayloadAction<PopupMessageInterface>) => {
       state.errorPopup = action.payload;
     },
+    showDeleteTodoPopup: (state, action: PayloadAction<boolean>) => {
+      state.deleteTodoPopup = action.payload;
+    },
+    showDeleteTodosPopup: (state, action: PayloadAction<boolean>) => {
+      state.deleteTodosPopup = action.payload;
+    },
+    showEditTodosPopup: (state, action: PayloadAction<boolean>) => {
+      state.editTodoPopup = action.payload;
+    },
+    showAddTodosPopup: (state, action: PayloadAction<boolean>) => {
+      state.addTodosPopup = action.payload;
+    },
+    showDeleteSelectedTodosPopup: (state, action: PayloadAction<boolean>) => {
+      state.deleteSelectedTodosPopup = action.payload;
+    },
 
     hidePopup: (state) => {
-      state.successPopup = DefaultPopupMessage;
-      state.errorPopup = DefaultPopupMessage;
       state.isLoading = false;
+      state.deleteTodoPopup = false;
+      state.deleteTodosPopup = false;
+      state.editTodoPopup = false;
+      state.addTodosPopup = false;
+      state.deleteSelectedTodosPopup = false;
     },
   },
 });
 
-export const { hidePopup, showSucessPopup, showErrorPopup, showIsLoading } =
-  popupSlice.actions;
+export const {
+  hidePopup,
+  showSucessPopup,
+  showErrorPopup,
+  showIsLoading,
+  showDeleteTodoPopup,
+  showDeleteTodosPopup,
+  showEditTodosPopup,
+  showAddTodosPopup,
+  showDeleteSelectedTodosPopup,
+} = popupSlice.actions;
 
 export default popupSlice.reducer;

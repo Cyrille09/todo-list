@@ -172,6 +172,7 @@
   border: none;
   padding: 5px 10px;
   text-align: center;
+  border-radius: 5px;
 }
 .btn a {
   display: inline-block;
@@ -183,11 +184,18 @@
 .btn:disabled {
   background-color: $gray-700;
   color: darkgray;
-  cursor: default;
+  cursor: not-allowed;
 }
 .btn:hover {
-  color: $white;
-  background-color: $gray-900;
+  color: auto;
+  background-color: auto;
+  opacity: 0.8;
+}
+
+.btn:disabled:hover {
+  background-color: $gray-700;
+  color: darkgray;
+  cursor: not-allowed;
 }
 
 .btn-white {
