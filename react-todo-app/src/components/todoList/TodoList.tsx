@@ -497,7 +497,11 @@ const TodoList: React.FC = () => {
                               )}
                             </tbody>
                           </Table>
-
+                          {!todosSlice.todos?.todos.length && (
+                            <div className="no-record">
+                              <p>No Task</p>
+                            </div>
+                          )}
                           <div>
                             <Pagination
                               pageCount={pageCount}

@@ -43,3 +43,9 @@
 .global-modal-cancelled {
   color: green;
 }
+
+.no-record {
+  justify-content: center;
+  text-align: center;
+  font-size: 20px;
+}
